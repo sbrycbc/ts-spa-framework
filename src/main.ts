@@ -27,7 +27,10 @@ class AppComponent {
 }
 
 @Component({
-    template: "<h1>Hallo {{name}}</h1>"
+    template: `
+    <h1>Hallo {{name}}</h1>
+    <button onclick="navigateToApp()">Go to App Component</button>
+    `
 })
 
 class HomeComponent {
@@ -40,6 +43,10 @@ class HomeComponent {
 
 function navigateToHome() {
     Router.navigate(HomeComponent);
+}
+
+function navigateToApp() {
+    Router.navigate(AppComponent);
 }
 
 window.addEventListener("load", () => {

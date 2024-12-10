@@ -37,11 +37,16 @@ let HomeComponent = class HomeComponent {
 };
 HomeComponent = __decorate([
     Component({
-        template: "<h1>Hallo {{name}}</h1>"
+        template: `<h1>Hallo {{name}}</h1>
+     <button onclick="navigateToApp()">Go to App Component</button>
+     `
     })
 ], HomeComponent);
 function navigateToHome() {
     Router.navigate(HomeComponent);
+}
+function navigateToApp() {
+    Router.navigate(AppComponent);
 }
 window.addEventListener("load", () => {
     Router.navigate(AppComponent);
