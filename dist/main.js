@@ -16,6 +16,19 @@ class Router {
         if (appRoot) {
             appRoot.innerHTML = new component().template;
         }
+        setRouteEvent();
+    }
+    static route(path) {
+        if (path === "home") {
+            return HomeComponent;
+        }
+        else if (path === "app") {
+            return AppComponent;
+        }
+        else if (path === "about") {
+            return AboutComponent;
+        }
+        return AppComponent;
     }
 }
 let AppComponent = class AppComponent {
@@ -24,7 +37,9 @@ AppComponent = __decorate([
     Component({
         template: `
     <h1>App Component</h1>
-    <button onclick="navigateToHome()">Go to Home Component</button>
+    <button route="home">Go to Home Component</button>
+    <button route="app">Go to App Component</button>
+    <button route="about">About Component</button>
     `
     })
 ], AppComponent);
@@ -37,17 +52,39 @@ let HomeComponent = class HomeComponent {
 };
 HomeComponent = __decorate([
     Component({
-        template: `<h1>Hallo {{name}}</h1>
-     <button onclick="navigateToApp()">Go to App Component</button>
-     `
+        template: `
+    <h1>Hallo {{name}}</h1>
+    <button route="home">Go to Home Component</button>
+    <button route="app">Go to App Component</button>
+    <button route="about">About Component</button>
+    `
     })
 ], HomeComponent);
-function navigateToHome() {
-    Router.navigate(HomeComponent);
-}
-function navigateToApp() {
-    Router.navigate(AppComponent);
+let AboutComponent = class AboutComponent {
+};
+AboutComponent = __decorate([
+    Component({
+        template: `
+     <h1>About Component</h1>
+     <button route="home">Go to Home Component</button>
+     <button route="app">Go to App Component</button>
+     <button route="about">About Component</button>
+     `
+    })
+], AboutComponent);
+function setRouteEvent() {
+    const routeElements = document.querySelectorAll("[route]");
+    for (let el of routeElements) {
+        el.addEventListener("click", (e) => {
+            const route = e.currentTarget.getAttribute("route");
+            if (route) {
+                const component = Router.route(route);
+                Router.navigate(component);
+            }
+        });
+    }
 }
 window.addEventListener("load", () => {
     Router.navigate(AppComponent);
+    setRouteEvent();
 });
