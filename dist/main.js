@@ -1,4 +1,3 @@
-"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -71,12 +70,57 @@ HomeComponent = __decorate([
         templateUrl: `/public/home.component.html  `
     })
 ], HomeComponent);
-let AboutComponent = class AboutComponent {
+class ComponentBase {
+    constructor() {
+        setTimeout(() => this.scanDomForNgModels(), 0);
+        setTimeout(() => this.scanDomForOnClick(), 0);
+    }
+    scanDomForNgModels() {
+        const elements = document.querySelectorAll("[ngModel]");
+        for (const el of elements) {
+            const bindingValue = el.getAttribute("ngModel");
+            if (bindingValue) {
+                let componentIntance = this;
+                while (componentIntance && !Object.prototype.hasOwnProperty.call(componentIntance, bindingValue)) {
+                    componentIntance = Object.getPrototypeOf(componentIntance);
+                }
+                if (componentIntance) {
+                    el.addEventListener("keyup", e => {
+                        componentIntance[bindingValue] = e.target.value;
+                    });
+                }
+            }
+        }
+    }
+    scanDomForOnClick() {
+        const buttons = document.querySelectorAll("[onclick]");
+        for (const el of buttons) {
+            const methodName = el.getAttribute("onclick");
+            if (methodName) {
+                el.addEventListener("click", () => {
+                    if (typeof this[methodName] === "function") {
+                        this[methodName]();
+                    }
+                });
+            }
+        }
+    }
+}
+let AboutComponent = class AboutComponent extends ComponentBase {
+    constructor() {
+        super(...arguments);
+        this.name = "";
+    }
+    showName() {
+        console.log(this.name);
+    }
 };
 AboutComponent = __decorate([
     Component({
         template: `
      <h1>About Component</h1>
+     <input ngModel="name">
+     <button id="show" onclick="showName">Show input Value</button>
      <button route="home">Go to Home Component</button>
      <button route="app">Go to App Component</button>
      <button route="about">About Component</button>

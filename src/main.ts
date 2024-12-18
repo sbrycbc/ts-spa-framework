@@ -63,9 +63,51 @@ class HomeComponent {
     }
 }
 
+class ComponentBase {
+    constructor() {
+        setTimeout(() => this.scanDomForNgModels(), 0);
+        setTimeout(() => this.scanDomForOnClick(), 0);
+    }
+    
+    scanDomForNgModels() {
+        const elements = document.querySelectorAll("[ngModel]");
+        for (const el of elements) {
+            const bindingValue = el.getAttribute("ngModel");
+            if (bindingValue) {
+                let componentIntance: any = this;
+                while (componentIntance && !Object.prototype.hasOwnProperty.call(componentIntance, bindingValue)) {
+                    componentIntance = Object.getPrototypeOf(componentIntance);
+                }
+                if (componentIntance) {
+                    el.addEventListener("keyup", e => {
+                        componentIntance[bindingValue] = (e.target as HTMLInputElement).value;
+                    })
+                }
+            }
+            
+        }
+    }
+
+    scanDomForOnClick() {
+        const buttons = document.querySelectorAll("[onclick]");
+        for (const el of buttons) {
+            const methodName = el.getAttribute("onclick");
+            if (methodName) {
+                el.addEventListener("click", () => {
+                    if (typeof this[methodName] === "function"){
+                        this[methodName]();
+                    }
+                })
+            }
+        }
+    }
+}
+
  @Component({
     template:`
      <h1>About Component</h1>
+     <input ngModel="name">
+     <button id="show" onclick="showName">Show input Value</button>
      <button route="home">Go to Home Component</button>
      <button route="app">Go to App Component</button>
      <button route="about">About Component</button>
@@ -73,7 +115,12 @@ class HomeComponent {
         
  })
 
- class AboutComponent {
+ class AboutComponent extends ComponentBase {
+     name: string = "";
+
+     showName() {
+         console.log(this.name);
+     }
      
 }
 
